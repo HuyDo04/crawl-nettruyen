@@ -1,0 +1,141 @@
+/* General Container */
+.homeContainer {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: sans-serif;
+
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+}
+
+/* Grid for Comics */
+.comicsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 25px;
+}
+
+/* Individual Comic Card */
+.comicCard {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.comicImageContainer {
+  position: relative;
+  cursor: pointer;
+
+  &:hover .comicChaptersOverlay {
+    opacity: 1;
+  }
+}
+
+.comicThumbnail {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Overlay for Chapters */
+.comicChaptersOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+  }
+
+  li {
+    padding: 5px 0;
+  }
+
+  a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+
+    &:hover {
+      text-decoration: underline;
+      color: #4ecca3;
+    }
+  }
+}
+
+/* Comic Name */
+.comicName {
+  padding: 10px;
+  font-size: 1rem;
+  text-align: center;
+  background-color: #f9f9f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+
+  button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background-color: #f0f0f0;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  span {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+}
+
+/* Loading and Error Status */
+.statusMessage {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 50px;
+
+  &.error {
+    color: #d9534f;
+  }
+}
