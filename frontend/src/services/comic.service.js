@@ -11,3 +11,32 @@ export const getAllComics = async (page = 1, limit = 36) => {
     
     return response;
 };
+
+export const getComicBySlug = async (slug) => {
+    const response = await httpRequest.get(`/truyen-tranh/${slug}`);
+    return response;
+};
+
+export const getChapterDetail = async (comicSlug, chapterSlug) => {
+    const response = await httpRequest.get(`/truyen-tranh/${comicSlug}/${chapterSlug}`);
+    
+    // Explicitly parse response.content if it's a string
+    if (response && response.content && typeof response.content === 'string') {
+        try {
+            response.content = JSON.parse(response.content);
+        } catch (e) {
+            console.error("Error parsing chapter content:", e);
+            response.content = []; // Fallback to empty array if parsing fails
+        }
+    }
+
+    // Transform image URLs to use the backend proxy
+    if (response && Array.isArray(response.content)) { // Ensure it's an array before mapping
+        response.content = response.content.map(imageUrl => {
+            // Assuming your backend is at the same origin as your frontend for simplicity
+            // If not, you'll need to use the full backend URL here
+            return `/api/v1/chapter-image?url=${encodeURIComponent(imageUrl)}`;
+        });
+    }
+    return response;
+};

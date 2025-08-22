@@ -33,7 +33,7 @@ module.exports = {
         allowNull: false,
       },
       number: {
-        type: Sequelize.DECIMAL(5, 2), // ví dụ: 1, 1.5, 2
+        type: Sequelize.DECIMAL(5, 1), // ví dụ: 1, 1.5, 2
         allowNull: true,
       },
       content: {

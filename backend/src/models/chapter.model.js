@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             number: {
-                type: DataTypes.DECIMAL(5, 2),
+                type: DataTypes.INTEGER,
                 allowNull: true,
             },
             content: {

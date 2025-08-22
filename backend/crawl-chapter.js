@@ -1,17 +1,23 @@
 const puppeteer = require("puppeteer");
 const { Comic, Chapter } = require("./src/models");
 const slugify = require("slugify");
+const getRandomUserAgent = require("./src/utils/getRandomUserAgent");
 
 async function crawlChapters(comic) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
+  await page.setExtraHTTPHeaders({
+    "referer": "https://nettruyenvia.com/",
+    "user-agent": getRandomUserAgent(),
+  });
+
   try {
-    console.log(`\n📖 Đang crawl chapters cho truyện: ${comic.name}`);
+    console.log(`\n Đang crawl chapters cho truyện: ${comic.name}`);
     await page.goto(comic.originalUrl, { waitUntil: "domcontentloaded" });
 
-    // ✅ Load hết tất cả chapters
-    console.log("✅ Đang load toàn bộ chapters...");
+    // Load hết tất cả chapters
+    console.log("Đang load toàn bộ chapters...");
     let hasMore = true;
     while (hasMore) {
       hasMore = await page.evaluate(() => {
@@ -24,14 +30,13 @@ async function crawlChapters(comic) {
       });
     
       if (hasMore) {
-        console.log("👉 Click xem thêm...");
-        // chờ 1.5s để chapter mới load
+        console.log("Click xem thêm...");
         await new Promise(resolve => setTimeout(resolve, 1500));
       }
     }
     
-console.log("Lấy toàn bộ chapters thành công!")
-    // ✅ Lấy danh sách chapters
+    console.log("Lấy toàn bộ chapters thành công!")
+    //Lấy danh sách chapters
     const chapters = await page.evaluate(() => {
       const items = document.querySelectorAll("#chapter_list a");
       return Array.from(items).map(el => ({
@@ -44,9 +49,9 @@ console.log("Lấy toàn bộ chapters thành công!")
       console.log(`⚠️ Không tìm thấy chapter nào cho: ${comic.name}`);
       return;
     }
-    console.log(`✅ Tìm thấy ${chapters.length} chapters cho truyện ${comic.name}`);
+    console.log(`Tìm thấy ${chapters.length} chapters cho truyện ${comic.name}`);
 
-    // ✅ Crawl từng chapter
+    // Crawl từng chapter
     for (let index = 0; index < chapters.length; index++) {
       const chapter = chapters[index];
       const slug = slugify(chapter.title, { lower: true, strict: true });
@@ -54,15 +59,21 @@ console.log("Lấy toàn bộ chapters thành công!")
       // Kiểm tra nếu chapter đã có
       const existed = await Chapter.findOne({ where: { comicId: comic.id, slug } });
       if (existed) {
-        console.log(`⏩ Bỏ qua (đã có): ${chapter.title}`);
+        console.log(`Bỏ qua (đã có): ${chapter.title}`);
         continue;
       }
 
       // Crawl ảnh chapter
       await page.goto(chapter.url, { waitUntil: "domcontentloaded" });
       const images = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll(".page-chapter img"))
-          .map(img => img.src);
+        return Array.from(document.querySelectorAll(".page-chapter img")).map(img => {
+          return (
+            img.getAttribute("data-src") ||
+            img.getAttribute("data-sv1") ||
+            img.getAttribute("data-sv2") ||
+            img.src
+          );
+        });
       });
 
       await Chapter.create({
@@ -71,13 +82,13 @@ console.log("Lấy toàn bộ chapters thành công!")
         slug,
         url: chapter.url,
         number: index + 1,
-        content: JSON.stringify(images),
+        content: images,
         crawlStatus: "completed",
         createdAt: new Date(),
         updatedAt: new Date()
       });
 
-      console.log(`📥 Đã crawl xong: ${chapter.title} (${images.length} ảnh)`);
+      console.log(`Đã crawl xong: ${chapter.title} (${images.length} ảnh)`);
     }
 
     // Cập nhật trạng thái
@@ -86,9 +97,9 @@ console.log("Lấy toàn bộ chapters thành công!")
       { where: { id: comic.id } }
     );
 
-    console.log(`🎉 Hoàn thành toàn bộ chapters cho: ${comic.name}`);
+    console.log(`Hoàn thành toàn bộ chapters cho: ${comic.name}`);
   } catch (error) {
-    console.error(`❌ Lỗi khi lấy chapter list cho ${comic.name}:`, error.message);
+    console.error(`Lỗi khi lấy chapter list cho ${comic.name}:`, error.message);
   } finally {
     await browser.close();
   }
