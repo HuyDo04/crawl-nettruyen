@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const puppeteer = require("puppeteer");
 const { Comic, Chapter } = require("./src/models");
 const slugify = require("slugify");
