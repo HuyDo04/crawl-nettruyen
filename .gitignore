@@ -15,6 +15,8 @@ frontend/build/
 # Env files
 backend/.env
 frontend/.env
+frontend/.env.production
+
 
 # System files
 .DS_Store
