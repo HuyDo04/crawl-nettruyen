@@ -150,8 +150,9 @@ const Home = () => {
               <ul>
                 {getLatestChapters(comic.chapters).map((chapter) => (
                   <li key={chapter.id}>
-                    {/* Removed <a> tag, as chapter links are handled on ComicDetail page */}
-                    Chapter {chapter.number}
+                    <Link to={`/truyen-tranh/${comic.slug}/${chapter.slug}`}>
+                      Chapter {chapter.number}
+                    </Link>
                   </li>
                 ))}
               </ul>
